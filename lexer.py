@@ -1,4 +1,4 @@
-import regex
+import re
 
 
 def tokenize(contents):
