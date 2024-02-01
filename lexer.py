@@ -1,4 +1,21 @@
-import re
+class Token:
+    def __init__(self, value, type):
+        self.value = value
+        self.type = type
+
+    def __repr__(self):
+        return "(" + str(self.type) + ":" + str(self.value) + ")"
+
+    def types():
+        return [
+            "Number",
+            "Identifier",
+            "Equal",
+            "OpenParen",
+            "CloseParen",
+            "BinaryOperator",
+            "Set",
+        ]
 
 
 def tokenize(contents):
@@ -7,12 +24,21 @@ def tokenize(contents):
 
     tokens = []
     for line in lines:
-        currtoken = line.split()
+        line = list(line)
+        for char in line:
+            if char == "(":
+                tokens.append(Token(char, Token.types().index("OpenParen")))
+            elif char == ")":
+                tokens.append(Token(char, Token.types().index("CloseParen")))
+            elif char == "=":
+                tokens.append(Token(char, Token.types().index("Equal")))
+            elif char in "+-/*":
+                tokens.append(Token(char, Token.types().index("BinaryOperator")))
 
     return tokens
 
 
 def parse(filename):
-    contents = open(filename, "r").read()
-    tokens = tokenize(contents)
+    source = open(filename, "r").read()
+    tokens = tokenize(source)
     return tokens
