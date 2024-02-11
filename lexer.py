@@ -18,7 +18,6 @@ class Token:
         # return "(" + str(self.type) + ":" + str(self.value) + ")"
         return str(self.type) + ":" + str(self.value)
 
-
 def tokenize(contents):
     # split contents into tokens
     lines = contents.split("\n")
