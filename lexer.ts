@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as process from 'process';
+
 export enum TokenType {
     Number,
     Indentifier,
@@ -33,7 +36,7 @@ export function tokenize (srcCode: string): Token[] {
     const tokens = new Array<Token>();
     const src = srcCode.split("");
 
-    while (src.length > 0) {
+    while (src.length) {
         if (src[0] == '(') {
             tokens.push(mktoken(src.shift(), TokenType.OpenParen));
         } else if (src[0] == ')') {
@@ -62,12 +65,18 @@ export function tokenize (srcCode: string): Token[] {
                 while (src.length > 0 && isnumeric(src[0])) {
                     num += src.shift();
                 }
-                tokens.push(mktoken(num, TokenType.Number))
+                tokens.push(mktoken(num, TokenType.Number));
+            } else if (src[0] == ' ' || src[0] == '\n' || src[0] == '\t') {
+                src.shift()
             } else {
-                throw new Error("Unrecognized character found in source: " + src[0])
+                throw new Error('Unrecognized character in source: ' + src[0])
             }
         }
     }
-
     return tokens;
+}
+
+const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
+for (const token of tokenize(source)) {
+    console.log(token);
 }
