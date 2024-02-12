@@ -8,6 +8,10 @@ export enum TokenType {
     Let,
 }
 
+const KEYWORDS: Record<string, TokenType> = {
+    "let": TokenType.Let,
+}
+
 export interface Token {
     value: string,
     type: TokenType;
@@ -31,23 +35,37 @@ export function tokenize (srcCode: string): Token[] {
 
     while (src.length > 0) {
         if (src[0] == '(') {
-            tokens.push(mktoken(src.shift(), TokenType.OpenParen))
+            tokens.push(mktoken(src.shift(), TokenType.OpenParen));
         } else if (src[0] == ')') {
-            tokens.push(mktoken(src.shift(), TokenType.CloseParen))
+            tokens.push(mktoken(src.shift(), TokenType.CloseParen));
         } else if (src[0] == '+' || src[0] == '-' || src[0] == '/' || src[0] == '*') {
-            tokens.push(mktoken(src.shift(), TokenType.BinaryOperator))
+            tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
-            tokens.push(mktoken(src.shift(), TokenType.Equals))
-        } else if (src[0] == '=') {
-            tokens.push(mktoken(src.shift(), TokenType.Equals))
+            tokens.push(mktoken(src.shift(), TokenType.Equals));
         } else {
             // Handle multicharacter tokens
             if (isalpha(src[0])) {
-                
+                let ident = "";
+                while (src.length > 0 && isalpha(src[0])) {
+                    ident += src.shift();
+                }
+
+                // Check for reserved keywords
+                const reserved = KEYWORDS[ident];
+                if (reserved == undefined) {
+                    tokens.push(mktoken(ident, TokenType.Indentifier));
+                } else {
+                    tokens.push(mktoken(ident, reserved));
+                }
             } else if (isnumeric(src[0])) {
-
+                let num = "";
+                while (src.length > 0 && isnumeric(src[0])) {
+                    num += src.shift();
+                }
+                tokens.push(mktoken(num, TokenType.Number))
+            } else {
+                throw new Error("Unrecognized character found in source: " + src[0])
             }
-
         }
     }
 
