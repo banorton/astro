@@ -79,7 +79,6 @@ function tokenize(srcCode) {
     return tokens;
 }
 exports.tokenize = tokenize;
-// let test: string = process.argv.slice(2,3)[0];
 var source = fs.readFileSync(process.argv.slice(2, 3)[0], 'utf8');
 for (var _i = 0, _a = tokenize(source); _i < _a.length; _i++) {
     var token = _a[_i];

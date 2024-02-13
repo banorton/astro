@@ -2,13 +2,21 @@ import * as fs from 'fs';
 import * as process from 'process';
 
 export enum TokenType {
+    // Literal Types
     Number,
     Indentifier,
+
+    // Keywords
+    Let,
+
+    // Grouping * Operators
     Equals,
     OpenParen,
     CloseParen,
     BinaryOperator,
-    Let,
+
+    // End of file
+    EOF,
 }
 
 const KEYWORDS: Record<string, TokenType> = {
@@ -69,10 +77,11 @@ export function tokenize (srcCode: string): Token[] {
             } else if (src[0] == ' ' || src[0] == '\n' || src[0] == '\t') {
                 src.shift()
             } else {
-                throw new Error('Unrecognized character in source: ' + src[0])
+                throw new Error('Unrecognized character in source: ' + src[0]);
             }
         }
     }
+    tokens.push(mktoken("EOF", TokenType.EOF))
     return tokens;
 }
 
