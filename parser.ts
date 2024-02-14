@@ -1,4 +1,4 @@
-import { Expression, Program, Statement } from "./ast";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
 
 export default class Parser {
@@ -6,6 +6,10 @@ export default class Parser {
 
     private token(): Token {
         return this.tokens[0];
+    }
+
+    private next(): Token {
+        return this.tokens.shift() as Token;
     }
 
     // STATEMENTS
@@ -34,7 +38,19 @@ export default class Parser {
     }
 
     private parse_additive_expression(): Expression {
-        const left = this.parse_primary_expression();
+        let left = this.parse_primary_expression();
+
+        const checks: string[] = ["+", "-"];
+        while (this.token().value in checks) {
+            const operator = this.next().value;
+            const right = this.parse_primary_expression();
+            left = {
+                kind: "BinaryExpression",
+                left: left,
+                right: right,
+                operator: operator,
+            } as BinaryExpression;
+        }
 
         return left;
     }
@@ -44,11 +60,15 @@ export default class Parser {
     }
 
     private parse_primary_expression(): Expression {
-        const tk = this[0].type;
-
-        switch (tk) {
+        switch (this.token().type) {
             case TokenType.Identifier:
-                return { kind: "Identifier", symbol: this.shift().value};
+                return { kind: "Identifier", symbol: this.token().value } as Identifier;
+            case TokenType.Number:
+                return { kind: "NumericLiteral", symbol: parseFloat(this.token().value) } as NumericLiteral;
+            case TokenType.Number:
+                return { kind: "NumericLiteral", symbol: parseFloat(this.token().value) } as NumericLiteral;
+            default:
+                return {} as Expression
         }
     }
 
