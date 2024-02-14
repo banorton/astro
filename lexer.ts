@@ -4,7 +4,7 @@ import * as process from 'process';
 export enum TokenType {
     // Literal Types
     Number,
-    Indentifier,
+    Identifier,
 
     // Keywords
     Let,
@@ -64,7 +64,7 @@ export function tokenize (srcCode: string): Token[] {
                 // Check for reserved keywords
                 const reserved = KEYWORDS[ident];
                 if (reserved == undefined) {
-                    tokens.push(mktoken(ident, TokenType.Indentifier));
+                    tokens.push(mktoken(ident, TokenType.Identifier));
                 } else {
                     tokens.push(mktoken(ident, reserved));
                 }

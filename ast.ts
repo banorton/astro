@@ -8,6 +8,7 @@ export interface Statement {
 
 export interface Program extends Statement {
     kind: "Program";
+    body: Statement[];
 }
 
 // Expression
