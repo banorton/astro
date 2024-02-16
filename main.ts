@@ -1,21 +1,34 @@
-import Parser from "./compiler/parser";
+import Parser from './compiler/parser';
+import * as readline from 'readline';
 // import * as fs from 'fs';
-// import * as process from 'process';
-
 // const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
 
 astro();
 
 function astro() {
     const parser = new Parser();
-    console.log("\nastro v0.1");
-    while (true) {
-        const input = prompt("> ");
-        if (!input || input.includes("exit")) {
-            throw new Error();
-        }
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    console.log("astro v0.1");
+    cmd(rl, parser);
+}
 
-        const program = parser.createAST(input);
-        console.log(program)
-    }
+function cmd(rl: readline.Interface, parser: Parser) {
+    rl.question('> ', (answer) => {
+        switch(answer) {
+            case 'exit':
+                rl.close();
+                process.exit();
+            case 'quit':
+                rl.close();
+                process.exit();
+            default:
+                const p = parser.createAST(answer);
+                console.log(p.body);
+        }
+    
+        cmd(rl, parser);
+    });
 }
