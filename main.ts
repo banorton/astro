@@ -1,4 +1,4 @@
-import Parser from './compiler/parser';
+import Parser from './analysis/parser';
 import * as readline from 'readline';
 // import * as fs from 'fs';
 // const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
