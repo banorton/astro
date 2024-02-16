@@ -23,6 +23,14 @@ export default class Parser {
         return this.tokens.shift() as Token;
     }
 
+    private nextExpect(expType: TokenType, errMsg: string): Token {
+        const tk = this.tokens.shift();
+        if (!tk || tk.type != expType) {
+            throw new Error("PARSER ERROR: " + errMsg);
+        }
+        return tk;
+    }
+
     // STATEMENTS
     public createAST(sourceCode: string): Program {
         this.tokens = tokenize(sourceCode);
@@ -94,9 +102,13 @@ export default class Parser {
                 return { kind: "Identifier", symbol: this.next().value } as Identifier;
             case TokenType.Number:
                 return { kind: "NumericLiteral", symbol: parseFloat(this.next().value) } as NumericLiteral;
+            case TokenType.OpenParen:
+                this.next();
+                const value = this.expression();
+                this.nextExpect(TokenType.CloseParen, "Expected TokenType.CloseParen but found " + this.token().type);
+                return value;
             default:
-                console.error("Unexpected token found during parsing!", this.token());
-                throw new Error();
+                throw new Error("PARSER ERROR: Unexpected token found: " + this.token());
         }
     }
 }
