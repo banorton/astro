@@ -46,7 +46,7 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.OpenParen));
         } else if (src[0] == ')') {
             tokens.push(mktoken(src.shift(), TokenType.CloseParen));
-        } else if (src[0] == '+' || src[0] == '-' || src[0] == '/' || src[0] == '*') {
+        } else if (src[0] == '+' || src[0] == '-' || src[0] == '/' || src[0] == '*' || src[0] == '%') {
             tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
             tokens.push(mktoken(src.shift(), TokenType.Equals));

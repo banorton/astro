@@ -37,7 +37,7 @@ export default class Parser {
             console.log(this.tokens);
             console.log(program.body);
             console.log("");
-            program.body.push(this.parse_statement());
+            program.body.push(this.statement());
         }
 
         return program;
@@ -72,6 +72,20 @@ export default class Parser {
 
     private multiplicative(): Expression {
         let left = this.primary();
+
+        const checks = ["*", "*", "/", "%"]
+        while (checks.includes(this.token().value)) {
+            const operator = this.next().value
+            const right = this.primary();
+            left = {
+                kind: "BinaryExpression",
+                left: left,
+                right: right,
+                operator: operator,
+            } as BinaryExpression;
+        }
+
+        return left;
     }
 
     private primary(): Expression {
