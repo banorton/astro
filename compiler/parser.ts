@@ -22,7 +22,7 @@ export default class Parser {
         };
 
         while (this.token().type != TokenType.EOF) {
-            program.body.push(this.parse_statement())
+            program.body.push(this.parse_statement());
         }
 
         return program;
@@ -68,7 +68,8 @@ export default class Parser {
             case TokenType.Number:
                 return { kind: "NumericLiteral", symbol: parseFloat(this.token().value) } as NumericLiteral;
             default:
-                return {} as Expression
+                console.error("Unexpected token found during parsing!", this.token());
+                throw new Error();
         }
     }
 

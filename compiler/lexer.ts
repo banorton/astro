@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as process from 'process';
-
 export enum TokenType {
     // Literal Types
     Number,
@@ -28,19 +25,19 @@ export interface Token {
     type: TokenType;
 }
 
-export function mktoken (value = "", type: TokenType): Token {
+export function mktoken(value = "", type: TokenType): Token {
     return { value, type };
 }
 
-export function isalpha (str: string): boolean {
+export function isalpha(str: string): boolean {
     return /^[a-zA-Z]$/.test(str)
 }
 
-export function isnumeric (str: string): boolean {
+export function isnumeric(str: string): boolean {
     return /^[0-9]$/.test(str)
 }
 
-export function tokenize (srcCode: string): Token[] {
+export function tokenize(srcCode: string): Token[] {
     const tokens = new Array<Token>();
     const src = srcCode.split("");
 
@@ -83,9 +80,4 @@ export function tokenize (srcCode: string): Token[] {
     }
     tokens.push(mktoken("EOF", TokenType.EOF))
     return tokens;
-}
-
-const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
-for (const token of tokenize(source)) {
-    console.log(token);
 }
