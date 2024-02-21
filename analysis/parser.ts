@@ -34,7 +34,6 @@ export default class Parser {
     // STATEMENTS
     public createAST(sourceCode: string): Program {
         this.tokens = tokenize(sourceCode);
-        // console.log(this.tokens)
 
         const program: Program = {
             kind: "Program",
@@ -42,9 +41,6 @@ export default class Parser {
         };
 
         while (this.token().type != TokenType.EOF) {
-            console.log(this.tokens);
-            console.log(program.body);
-            console.log("");
             program.body.push(this.statement());
         }
 

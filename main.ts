@@ -1,5 +1,6 @@
 import Parser from './analysis/parser';
 import * as readline from 'readline';
+import { evaluate } from './synthesis/interpreter'
 // import * as fs from 'fs';
 // const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
 
@@ -25,8 +26,11 @@ function cmd(rl: readline.Interface, parser: Parser) {
                 rl.close();
                 process.exit();
             default:
-                const p = parser.createAST(answer);
-                console.log(p.body);
+                const ast = parser.createAST(answer);
+                const i = evaluate(ast);
+                // console.log(ast.body);
+                // console.log("============================================\n");
+                console.log(i);
         }
     
         cmd(rl, parser);
