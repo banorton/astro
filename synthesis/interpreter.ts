@@ -1,25 +1,34 @@
 import { ValueType, RuntimeVal, NumberVal, NullVal } from "./values"
-import { BinaryExpression, NodeType, NumericLiteral, Program, Statement } from "../analysis/ast"
+import { BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement } from "../analysis/ast"
 import { Runtime } from "inspector";
+import Environment from "./environment";
+import { env } from "process";
 
-export function evaluate(astNode: Statement): RuntimeVal {
+export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
     switch (astNode.kind) {
         case "NumericLiteral":
             return { type: "number", value: (astNode as NumericLiteral).symbol } as NumberVal;
         case "NullLiteral":
             return { value: "null", type: "null"} as NullVal;
+        case "Identifier":
+            return evaluateIdentifier(astNode as Identifier, env);
         case "BinaryExpression":
-            return evaluateBinaryExpression(astNode as BinaryExpression);
+            return evaluateBinaryExpression(astNode as BinaryExpression, env);
         case "Program":
-            return evaluateProgram(astNode as Program);
+            return evaluateProgram(astNode as Program, env);
         default:
             throw new Error("INTERPRETER ERROR: This AST Node has not yet been setup for interpretation. " + astNode);
     }
 }
 
-function evaluateBinaryExpression(binop: BinaryExpression): RuntimeVal {
-    const lhs = evaluate(binop.left);
-    const rhs = evaluate(binop.right);
+function evaluateIdentifier(iden: Identifier, env: Environment): RuntimeVal {
+    const val = env.findVar(iden.symbol);
+    return val;
+}
+
+function evaluateBinaryExpression(binop: BinaryExpression, env: Environment): RuntimeVal {
+    const lhs = evaluate(binop.left, env);
+    const rhs = evaluate(binop.right, env);
     const op = binop.operator;
 
     if (lhs.type == "number" && rhs.type == "number") {
@@ -46,10 +55,10 @@ function evaluateNumericBinaryExpression(lhs: NumberVal, rhs: NumberVal, op: str
     return { value: result, type: "number" };
 }
 
-function evaluateProgram(program: Program): RuntimeVal {
+function evaluateProgram(program: Program, env: Environment): RuntimeVal {
     let lastEvaluated: RuntimeVal = { type: "null", value: "null" } as NullVal;
     for (const statement of program.body) {
-        lastEvaluated = evaluate(statement);
+        lastEvaluated = evaluate(statement, env);
     }
     return lastEvaluated;
 }

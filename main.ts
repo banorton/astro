@@ -1,22 +1,24 @@
 import Parser from './analysis/parser';
 import * as readline from 'readline';
 import { evaluate } from './synthesis/interpreter'
-// import * as fs from 'fs';
-// const source = fs.readFileSync(process.argv.slice(2,3)[0], 'utf8');
+import Environment from './synthesis/environment';
+import { NumberVal } from './synthesis/values';
 
-astro();
+repl();
 
-function astro() {
+function repl() {
     const parser = new Parser();
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
-    console.log("astro v0.1");
-    cmd(rl, parser);
+    const env = new Environment();
+    env.declareVar("x", { type: "number", value: 100} as NumberVal);
+    console.log("repl v0.1");
+    cmd(rl, parser, env);
 }
 
-function cmd(rl: readline.Interface, parser: Parser) {
+function cmd(rl: readline.Interface, parser: Parser, env: Environment) {
     rl.question('> ', (answer) => {
         switch(answer) {
             case 'exit':
@@ -27,12 +29,12 @@ function cmd(rl: readline.Interface, parser: Parser) {
                 process.exit();
             default:
                 const ast = parser.createAST(answer);
-                const i = evaluate(ast);
+                const i = evaluate(ast, env);
                 // console.log(ast.body);
                 // console.log("============================================\n");
                 console.log(i);
         }
     
-        cmd(rl, parser);
+        cmd(rl, parser, env);
     });
 }
