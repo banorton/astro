@@ -1,5 +1,7 @@
-import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression } from "./ast";
+import { PassThrough } from "stream";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, VariableDeclaration } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
+import exp from "constants";
 
 // Orders of Precedence
 // Assignment Expression
@@ -48,7 +50,42 @@ export default class Parser {
     }
 
     private statement(): Statement {
-        return this.expression();
+        switch (this.token().type) {
+            case TokenType.Let:
+                return this.varDeclaration();
+            case TokenType.Const:
+                return this.varDeclaration();
+            default:
+                return this.expression();
+        }
+    }
+    
+    private varDeclaration(): VariableDeclaration {
+        const isConst = this.next().type == TokenType.Const;
+        const id = this.nextExpect(TokenType.Identifier, "Expected TokenType.Identifier but found " + this.token().type).value;
+        if (this.token().type == TokenType.NewLine || this.token().type == TokenType.Comma) {
+            if (isConst) {
+                throw new Error("PARSER ERROR: Must assign a value to a const expression.")
+            } else {
+                return {
+                    kind: "VariableDeclaration",
+                    constant: false,
+                    id: id,
+                } as VariableDeclaration;
+            }
+        } else if (this.token().type == TokenType.Equals) {
+            this.next();
+            const dec = {
+                kind: "VariableDeclaration",
+                constant: isConst,
+                id: id,
+                value: this.expression(),
+            } as VariableDeclaration;
+            this.nextExpect(TokenType.Comma, "Variable declaration statements must end in a newline or comma but found " + this.token().value);
+            return dec;
+        } else {
+            throw new Error("Unexpected token: " + this.token().value)
+        }
     }
 
     // EXPRESSIONS
@@ -89,7 +126,7 @@ export default class Parser {
             } as BinaryExpression;
         }
 
-        return left;
+       return left;
     }
 
     private primary(): Expression {
@@ -104,7 +141,7 @@ export default class Parser {
                 this.nextExpect(TokenType.CloseParen, "Expected TokenType.CloseParen but found " + this.token().type);
                 return value;
             default:
-                throw new Error("PARSER ERROR: Unexpected token found: " + this.token());
+                throw new Error("PARSER ERROR: Unexpected token found: " + this.token().value);
         }
     }
 }

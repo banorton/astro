@@ -1,4 +1,12 @@
-export type NodeType = "Program" | "NumericLiteral" | "Identifier" | "BinaryExpression";
+export type NodeType = 
+// STATEMENTS
+| "Program"
+| "VariableDeclaration"
+
+// EXPRESSIONS
+| "NumericLiteral"
+| "Identifier" 
+| "BinaryExpression";
 
 // Statement
 export interface Statement {
@@ -10,22 +18,29 @@ export interface Program extends Statement {
     body: Statement[];
 }
 
+export interface VariableDeclaration extends Statement {
+    kind: "VariableDeclaration";
+    constant: boolean;
+    id: string;
+    value?: Expression;
+}
+
 // Expression
 export interface Expression extends Statement {}
 
 export interface BinaryExpression extends Expression {
-    kind: "BinaryExpression"
-    left: Expression
-    right: Expression
+    kind: "BinaryExpression";
+    left: Expression;
+    right: Expression;
     operator: string;
 }
 
 export interface Identifier extends Expression {
-    kind: "Identifier"
+    kind: "Identifier";
     symbol: string;
 }
 
 export interface NumericLiteral extends Expression {
-    kind: "NumericLiteral"
+    kind: "NumericLiteral";
     symbol: number;
 }

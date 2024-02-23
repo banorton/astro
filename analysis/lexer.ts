@@ -6,12 +6,15 @@ export enum TokenType {
 
     // Keywords
     Let,
+    Const,
 
     // Grouping * Operators
     Equals,
     OpenParen,
     CloseParen,
     BinaryOperator,
+    NewLine,
+    Comma,
 
     // End of file
     EOF,
@@ -19,6 +22,7 @@ export enum TokenType {
 
 const KEYWORDS: Record<string, TokenType> = {
     let: TokenType.Let,
+    const: TokenType.Const,
 }
 
 export interface Token {
@@ -51,6 +55,10 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
             tokens.push(mktoken(src.shift(), TokenType.Equals));
+        } else if (src[0] == '\n') {
+            tokens.push(mktoken(src.shift(), TokenType.NewLine));
+        } else if (src[0] == ',') {
+            tokens.push(mktoken(src.shift(), TokenType.Comma));
         } else {
             // Handle multicharacter tokens
             if (isalpha(src[0])) {
@@ -73,7 +81,7 @@ export function tokenize(srcCode: string): Token[] {
                     num += src.shift();
                 }
                 tokens.push(mktoken(num, TokenType.Number));
-            } else if (src[0] == ' ' || src[0] == '\n' || src[0] == '\t') {
+            } else if (src[0] == ' ' || src[0] == '\t') {
                 src.shift()
             } else {
                 throw new Error('LEXER ERROR: Unrecognized character in source: ' + src[0]);

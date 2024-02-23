@@ -1,5 +1,5 @@
 import { ValueType, RuntimeVal, NumberVal, NullVal, MKNULL, MKNUMBER } from "./values"
-import { BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement } from "../analysis/ast"
+import { BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement, VariableDeclaration } from "../analysis/ast"
 import { Runtime } from "inspector";
 import Environment from "./environment";
 import { env } from "process";
@@ -12,11 +12,18 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
             return evaluateIdentifier(astNode as Identifier, env);
         case "BinaryExpression":
             return evaluateBinaryExpression(astNode as BinaryExpression, env);
+        case "VariableDeclaration":
+            return evaluateVarDeclaration(astNode as VariableDeclaration, env);
         case "Program":
             return evaluateProgram(astNode as Program, env);
         default:
-            throw new Error("INTERPRETER ERROR: This AST Node has not yet been setup for interpretation. " + astNode);
+            throw new Error("INTERPRETER ERROR: This AST Node has not yet been setup for interpretation: " + astNode);
     }
+}
+
+function evaluateVarDeclaration(vardec: VariableDeclaration, env: Environment): RuntimeVal {
+    const val = vardec.value ? evaluate(vardec.value, env) : MKNULL();
+    return env.declareVar(vardec.id, val);
 }
 
 function evaluateIdentifier(iden: Identifier, env: Environment): RuntimeVal {

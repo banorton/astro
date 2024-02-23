@@ -13,10 +13,6 @@ function repl() {
         output: process.stdout,
     });
     const env = new Environment();
-    env.declareVar("x", MKNUMBER(100));
-    env.declareVar("false", MKBOOL(false));
-    env.declareVar("true", MKBOOL(true));
-    env.declareVar("null", MKNULL());
     console.log("repl v0.1");
     cmd(rl, parser, env);
 }
