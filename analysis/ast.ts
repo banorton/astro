@@ -1,4 +1,4 @@
-export type NodeType = "Program" | "NumericLiteral" | "Identifier" | "BinaryExpression" | "NullLiteral";
+export type NodeType = "Program" | "NumericLiteral" | "Identifier" | "BinaryExpression";
 
 // Statement
 export interface Statement {
@@ -28,9 +28,4 @@ export interface Identifier extends Expression {
 export interface NumericLiteral extends Expression {
     kind: "NumericLiteral"
     symbol: number;
-}
-
-export interface NullLiteral extends Expression {
-    kind: "NullLiteral"
-    symbol: "null";
 }

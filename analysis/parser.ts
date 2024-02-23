@@ -1,4 +1,4 @@
-import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, NullLiteral } from "./ast";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
 
 // Orders of Precedence
@@ -103,8 +103,6 @@ export default class Parser {
                 const value = this.expression();
                 this.nextExpect(TokenType.CloseParen, "Expected TokenType.CloseParen but found " + this.token().type);
                 return value;
-            case TokenType.Null:
-                return { kind: "NullLiteral", symbol: this.next().value } as NullLiteral;
             default:
                 throw new Error("PARSER ERROR: Unexpected token found: " + this.token());
         }

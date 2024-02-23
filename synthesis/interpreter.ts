@@ -1,4 +1,4 @@
-import { ValueType, RuntimeVal, NumberVal, NullVal } from "./values"
+import { ValueType, RuntimeVal, NumberVal, NullVal, MKNULL, MKNUMBER } from "./values"
 import { BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement } from "../analysis/ast"
 import { Runtime } from "inspector";
 import Environment from "./environment";
@@ -7,9 +7,7 @@ import { env } from "process";
 export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
     switch (astNode.kind) {
         case "NumericLiteral":
-            return { type: "number", value: (astNode as NumericLiteral).symbol } as NumberVal;
-        case "NullLiteral":
-            return { value: "null", type: "null"} as NullVal;
+            return { type: "number", value: (astNode as NumericLiteral).symbol } as NumberVal;;
         case "Identifier":
             return evaluateIdentifier(astNode as Identifier, env);
         case "BinaryExpression":
@@ -35,7 +33,7 @@ function evaluateBinaryExpression(binop: BinaryExpression, env: Environment): Ru
         return evaluateNumericBinaryExpression(lhs as NumberVal, rhs as NumberVal, op as string);
     }
 
-    return {type: "null", value: "null"} as NullVal;
+    return MKNULL();
 }
 
 function evaluateNumericBinaryExpression(lhs: NumberVal, rhs: NumberVal, op: string): NumberVal {
@@ -56,7 +54,7 @@ function evaluateNumericBinaryExpression(lhs: NumberVal, rhs: NumberVal, op: str
 }
 
 function evaluateProgram(program: Program, env: Environment): RuntimeVal {
-    let lastEvaluated: RuntimeVal = { type: "null", value: "null" } as NullVal;
+    let lastEvaluated: RuntimeVal = MKNULL();
     for (const statement of program.body) {
         lastEvaluated = evaluate(statement, env);
     }

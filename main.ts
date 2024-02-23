@@ -2,7 +2,7 @@ import Parser from './analysis/parser';
 import * as readline from 'readline';
 import { evaluate } from './synthesis/interpreter'
 import Environment from './synthesis/environment';
-import { NumberVal } from './synthesis/values';
+import { MKBOOL, MKNUMBER, MKNULL, NumberVal } from './synthesis/values';
 
 repl();
 
@@ -13,7 +13,10 @@ function repl() {
         output: process.stdout,
     });
     const env = new Environment();
-    env.declareVar("x", { type: "number", value: 100} as NumberVal);
+    env.declareVar("x", MKNUMBER(100));
+    env.declareVar("false", MKBOOL(false));
+    env.declareVar("true", MKBOOL(true));
+    env.declareVar("null", MKNULL());
     console.log("repl v0.1");
     cmd(rl, parser, env);
 }
