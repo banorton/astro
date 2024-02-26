@@ -62,7 +62,7 @@ export default class Parser {
     
     private varDeclaration(): VariableDeclaration {
         const isConst = this.next().type == TokenType.Const;
-        const id = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found ${this.token().type}.`).value;
+        const id = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found '${this.token().type}'`).value;
         if (this.token().type == TokenType.NewLine || this.token().type == TokenType.Comma) {
             if (isConst) {
                 throw new Error("Must assign a value to a const expression.");
@@ -81,10 +81,10 @@ export default class Parser {
                 id: id,
                 value: this.expression(),
             } as VariableDeclaration;
-            this.nextExpect(TokenType.Comma, `Variable declaration statements must end in a newline or comma but found ${this.token().value}.`);
+            this.nextExpect(TokenType.Comma, `Variable declaration statements must end in a newline or comma but found '${this.token().value}'`);
             return dec;
         } else {
-            throw new Error(`Unexpected token found: ${this.token().value}.`);
+            throw new Error(`Unexpected token found: '${this.token().value}'`);
         }
     }
 
@@ -138,10 +138,10 @@ export default class Parser {
             case TokenType.OpenParen:
                 this.next();
                 const value = this.expression();
-                this.nextExpect(TokenType.CloseParen, `Expected TokenType.CloseParen but found ${this.token().type}.`);
+                this.nextExpect(TokenType.CloseParen, `Expected TokenType.CloseParen but found '${this.token().type}'`);
                 return value;
             default:
-                throw new Error(`Unexpected token found: ${this.token().value}.`);
+                throw new Error(`Unexpected token found: '${this.token().value}'`);
         }
     }
 }

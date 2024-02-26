@@ -35,7 +35,7 @@ export default class Environment {
         }
         
         if (this.parent == undefined) {
-            throw new Error(`Could not resolve variable: '${varname}.'`);
+            throw new Error(`Could not resolve variable: '${varname}'`);
         }
 
         return this.parent.resolve(varname);
