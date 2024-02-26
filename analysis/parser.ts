@@ -67,6 +67,7 @@ export default class Parser {
             if (isConst) {
                 throw new Error("Must assign a value to a const expression.");
             } else {
+                this.next();
                 return {
                     kind: "VariableDeclaration",
                     constant: false,
