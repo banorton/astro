@@ -84,7 +84,7 @@ export function tokenize(srcCode: string): Token[] {
             } else if (src[0] == ' ' || src[0] == '\t') {
                 src.shift()
             } else {
-                throw new Error('LEXER ERROR: Unrecognized character in source: ' + src[0]);
+                throw new Error(`Unrecognized character in source: ${src[0]}.`);
             }
         }
     }

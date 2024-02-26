@@ -11,7 +11,7 @@ export default class Environment {
 
     public declareVar(varname: string, value: RuntimeVal) {
         if (this.variables.has(varname)) {
-            throw new Error('The variable ${varname} cannot be declared as it already exists.');
+            throw new Error(`The variable '${varname}' cannot be declared as it already exists.`);
         }
 
         this.variables.set(varname, value);
@@ -35,7 +35,7 @@ export default class Environment {
         }
         
         if (this.parent == undefined) {
-            throw new Error("Could not resolve variable '${varname}'.");
+            throw new Error(`Could not resolve variable: '${varname}.'`);
         }
 
         return this.parent.resolve(varname);

@@ -17,7 +17,7 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
         case "Program":
             return evaluateProgram(astNode as Program, env);
         default:
-            throw new Error("INTERPRETER ERROR: This AST Node has not yet been setup for interpretation: " + astNode);
+            throw new Error(`This AST Node has not yet been setup for interpretation: ${astNode}.`);
     }
 }
 
