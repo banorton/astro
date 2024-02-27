@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, Declaration, Assignment } from "./ast";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, Declaration, Assignment, Property, ObjectLiteral } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
 import exp from "constants";
 
@@ -99,7 +99,7 @@ export default class Parser {
     }
 
     private assignment(): Expression {
-        let left = this.additive();
+        let left = this.object();
 
         if (this.token().type == TokenType.Equals) {
             this.next();
@@ -108,6 +108,38 @@ export default class Parser {
         }
 
         return left;
+    }
+
+    private object(): Expression {
+        if (this.token().type !== TokenType.OpenBrace) {
+            return this.additive();
+        }
+
+        this.next();
+        const properties = new Array<Property>();
+
+        while (this.token().type !== TokenType.EOF && this.token().type !== TokenType.CloseBrace) {
+            const key = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found: '${this.token().type}'`)
+
+            if (this.token().type == TokenType.Comma || this.token().type == TokenType.CloseBrace) {
+                this.next();
+                properties.push({ kind: "Property", key: key.value } as Property);
+                continue;
+            } else if (this.token().type == TokenType.Colon) {
+                this.next();
+                const value = this.expression();
+                properties.push({ kind: "Property", key: key.value, value: value } as Property);
+                if (this.token().type !== TokenType.CloseBrace) {
+                    this.nextExpect(TokenType.Comma, `Expected TokenType.Comma but found: '${this.token().type}'`)
+                }
+
+            } else {
+                throw new Error(`Unexpected token found: '${this.token().type}'`)
+            }
+        }
+
+        this.next();
+        return { kind: "ObjectLiteral", properties: properties } as ObjectLiteral;
     }
 
     private additive(): Expression {

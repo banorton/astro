@@ -2,11 +2,13 @@ export type NodeType =
 // STATEMENTS
 | "Program"
 | "Declaration"
-| "Assignment"
 
 // EXPRESSIONS
 | "NumericLiteral"
-| "Identifier" 
+| "Identifier"
+| "Assignment"
+| "ObjectLiteral"
+| "Property"
 | "BinaryExpression";
 
 // Statement
@@ -40,6 +42,17 @@ export interface BinaryExpression extends Expression {
     left: Expression;
     right: Expression;
     operator: string;
+}
+
+export interface Property extends Expression {
+    kind: "Property";
+    key: string;
+    value?: Expression;
+}
+
+export interface ObjectLiteral extends Expression {
+    kind: "ObjectLiteral";
+    properties: Property[];
 }
 
 export interface Identifier extends Expression {

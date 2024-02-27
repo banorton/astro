@@ -12,9 +12,12 @@ export enum TokenType {
     Equals,
     OpenParen,
     CloseParen,
+    OpenBrace,
+    CloseBrace,
     BinaryOperator,
     Semicolon,
-    NewLine,
+    Colon,
+    // NewLine,
     Comma,
 
     // End of file
@@ -52,14 +55,20 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.OpenParen));
         } else if (src[0] == ')') {
             tokens.push(mktoken(src.shift(), TokenType.CloseParen));
+        } else if (src[0] == '{') {
+            tokens.push(mktoken(src.shift(), TokenType.OpenBrace));
+        } else if (src[0] == '}') {
+            tokens.push(mktoken(src.shift(), TokenType.CloseBrace));
         } else if (src[0] == '+' || src[0] == '-' || src[0] == '/' || src[0] == '*' || src[0] == '%') {
             tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
             tokens.push(mktoken(src.shift(), TokenType.Equals));
         } else if (src[0] == ';') {
             tokens.push(mktoken(src.shift(), TokenType.Semicolon));
-        } else if (src[0] == '\n') {
-            tokens.push(mktoken(src.shift(), TokenType.NewLine));
+        } else if (src[0] == ':') {
+            tokens.push(mktoken(src.shift(), TokenType.Colon));
+        // } else if (src[0] == '\n') {
+        //     tokens.push(mktoken(src.shift(), TokenType.NewLine));
         } else if (src[0] == ',') {
             tokens.push(mktoken(src.shift(), TokenType.Comma));
         } else {
@@ -77,14 +86,13 @@ export function tokenize(srcCode: string): Token[] {
                 } else {
                     tokens.push(mktoken(ident, TokenType.Identifier));
                 }
-
             } else if (isnumeric(src[0])) {
                 let num = "";
                 while (src.length > 0 && isnumeric(src[0])) {
                     num += src.shift();
                 }
                 tokens.push(mktoken(num, TokenType.Number));
-            } else if (src[0] == ' ' || src[0] == '\t') {
+            } else if (src[0] == ' ' || src[0] == '\t' || src[0] == '\n') {
                 src.shift()
             } else {
                 throw new Error(`Unrecognized character in source: '${src[0]}'`);

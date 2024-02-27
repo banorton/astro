@@ -1,5 +1,5 @@
-import { ValueType, RuntimeVal, NumberVal, NullVal, MKNULL, MKNUMBER } from "./values"
-import { Assignment, BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement, Declaration } from "../analysis/ast"
+import { ValueType, RuntimeVal, NumberVal, NullVal, MKNULL, MKNUMBER, ObjectVal } from "./values"
+import { Assignment, BinaryExpression, Identifier, NodeType, NumericLiteral, Program, Statement, Declaration, ObjectLiteral } from "../analysis/ast"
 import { Runtime } from "inspector";
 import Environment from "./environment";
 import { env } from "process";
@@ -16,6 +16,8 @@ export function evaluate(astNode: Statement, env: Environment): RuntimeVal {
             return evaluateDeclaration(astNode as Declaration, env);
         case "Assignment":
             return evaluateAssignment(astNode as Assignment, env);
+        case "ObjectLiteral":
+            return evaluateObject(astNode as ObjectLiteral, env);
         case "Program":
             return evaluateProgram(astNode as Program, env);
         default:
@@ -43,6 +45,19 @@ function evaluateAssignment(assign: Assignment, env: Environment): RuntimeVal {
 
     const varname = (assign.left as Identifier).symbol;
     return env.assignVar(varname, evaluate(assign.right, env));
+}
+
+function evaluateObject(ObjLiteral: ObjectLiteral, env: Environment): RuntimeVal {
+    const objVal = { type: "object", properties: new Map() } as ObjectVal;
+    for (const { key, value } of ObjLiteral.properties) {
+        console.log(env.variables);
+        console.log(env.findVar(key));
+        const val = (value == undefined) ? env.findVar(key) : evaluate(value, env);
+
+        objVal.properties.set(key, val);
+    }
+
+    return objVal;
 }
 
 function evaluateBinaryExpression(binop: BinaryExpression, env: Environment): RuntimeVal {
