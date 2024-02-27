@@ -13,6 +13,7 @@ export enum TokenType {
     OpenParen,
     CloseParen,
     BinaryOperator,
+    Semicolon,
     NewLine,
     Comma,
 
@@ -55,6 +56,8 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
             tokens.push(mktoken(src.shift(), TokenType.Equals));
+        } else if (src[0] == ';') {
+            tokens.push(mktoken(src.shift(), TokenType.Semicolon));
         } else if (src[0] == '\n') {
             tokens.push(mktoken(src.shift(), TokenType.NewLine));
         } else if (src[0] == ',') {

@@ -3,18 +3,23 @@ import { RuntimeVal } from "./values";
 export default class Environment {
     private parent?: Environment;
     private variables: Map<string, RuntimeVal>;
+    private constants: Set<string>;
 
     constructor(parent?: Environment) {
         this.parent = parent;
         this.variables = new Map();
+        this.constants = new Set();
     }
 
-    public declareVar(varname: string, value: RuntimeVal) {
-        if (this.variables.has(varname)) {
+    public declareVar(varname: string, value: RuntimeVal, isConst: boolean) {
+        if (this.variables.has(varname) || this.constants.has(varname)) {
             throw new Error(`The variable '${varname}' cannot be declared as it already exists.`);
         }
-
+        
         this.variables.set(varname, value);
+        if (isConst) {
+            this.constants.add(varname);
+        }
         return value;
     }
 

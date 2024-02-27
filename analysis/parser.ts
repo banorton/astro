@@ -1,5 +1,5 @@
 import { PassThrough } from "stream";
-import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, VariableDeclaration } from "./ast";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, Declaration, Assignment } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
 import exp from "constants";
 
@@ -33,7 +33,6 @@ export default class Parser {
         return tk;
     }
 
-    // STATEMENTS
     public createAST(sourceCode: string): Program {
         this.tokens = tokenize(sourceCode);
 
@@ -49,6 +48,7 @@ export default class Parser {
         return program;
     }
 
+    // STATEMENTS
     private statement(): Statement {
         switch (this.token().type) {
             case TokenType.Let:
@@ -60,29 +60,33 @@ export default class Parser {
         }
     }
     
-    private varDeclaration(): VariableDeclaration {
+    private varDeclaration(): Declaration {
         const isConst = this.next().type == TokenType.Const;
         const id = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found '${this.token().type}'`).value;
-        if (this.token().type == TokenType.NewLine || this.token().type == TokenType.Comma) {
+
+        if (this.token().type == TokenType.Semicolon) {
             if (isConst) {
                 throw new Error("Must assign a value to a const expression.");
             } else {
                 this.next();
+
                 return {
-                    kind: "VariableDeclaration",
+                    kind: "Declaration",
                     constant: false,
                     id: id,
-                } as VariableDeclaration;
+                } as Declaration;
             }
         } else if (this.token().type == TokenType.Equals) {
             this.next();
+
             const dec = {
-                kind: "VariableDeclaration",
+                kind: "Declaration",
                 constant: isConst,
                 id: id,
                 value: this.expression(),
-            } as VariableDeclaration;
-            this.nextExpect(TokenType.Comma, `Variable declaration statements must end in a newline or comma but found '${this.token().value}'`);
+            } as Declaration;
+            this.nextExpect(TokenType.Semicolon, `Variable declaration statements must end in a semicolon but found '${this.token().value}'`);
+
             return dec;
         } else {
             throw new Error(`Unexpected token found: '${this.token().value}'`);
@@ -91,7 +95,19 @@ export default class Parser {
 
     // EXPRESSIONS
     private expression(): Expression {
-        return this.additive();
+        return this.assignment();
+    }
+
+    private assignment(): Expression {
+        let left = this.additive();
+
+        if (this.token().type == TokenType.Equals) {
+            this.next();
+            const right = this.assignment();
+            return { kind: "Assignment", left: left, right: right } as Assignment
+        }
+
+        return left;
     }
 
     private additive(): Expression {
