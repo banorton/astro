@@ -50,8 +50,6 @@ function evaluateAssignment(assign: Assignment, env: Environment): RuntimeVal {
 function evaluateObject(ObjLiteral: ObjectLiteral, env: Environment): RuntimeVal {
     const objVal = { type: "object", properties: new Map() } as ObjectVal;
     for (const { key, value } of ObjLiteral.properties) {
-        console.log(env.variables);
-        console.log(env.findVar(key));
         const val = (value == undefined) ? env.findVar(key) : evaluate(value, env);
 
         objVal.properties.set(key, val);

@@ -1,17 +1,16 @@
 import { PassThrough } from "stream";
-import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, Declaration, Assignment, Property, ObjectLiteral } from "./ast";
+import { Expression, Identifier, NumericLiteral, Program, Statement, BinaryExpression, Declaration, Assignment, Property, ObjectLiteral, Member, Call } from "./ast";
 import { TokenType, tokenize, Token } from "./lexer";
 import exp from "constants";
 
 // Orders of Precedence
 // Assignment Expression
-// Member Expression
-// Function Call
 // Logical Expression
 // Comparison Expression
 // Additive Expression
 // Multiplicative Expression
-// Unary Expression
+// Call
+// Member
 // Primary Expression
 
 export default class Parser {
@@ -118,10 +117,10 @@ export default class Parser {
         this.next();
         const properties = new Array<Property>();
 
-        while (this.token().type !== TokenType.EOF && this.token().type !== TokenType.CloseBrace) {
-            const key = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found: '${this.token().type}'`)
+        while (this.token().type !== TokenType.CloseBrace) {
+            const key = this.nextExpect(TokenType.Identifier, `Expected TokenType.Identifier but found: '${this.token().value}'`)
 
-            if (this.token().type == TokenType.Comma || this.token().type == TokenType.CloseBrace) {
+            if (this.token().type == TokenType.Comma) {
                 this.next();
                 properties.push({ kind: "Property", key: key.value } as Property);
                 continue;
@@ -130,11 +129,10 @@ export default class Parser {
                 const value = this.expression();
                 properties.push({ kind: "Property", key: key.value, value: value } as Property);
                 if (this.token().type !== TokenType.CloseBrace) {
-                    this.nextExpect(TokenType.Comma, `Expected TokenType.Comma but found: '${this.token().type}'`)
+                    this.nextExpect(TokenType.Comma, `Expected TokenType.Comma but found: '${this.token().value}'`)
                 }
-
             } else {
-                throw new Error(`Unexpected token found: '${this.token().type}'`)
+                throw new Error(`Expected TokenType.Comma or TokenType.Colon but found: '${this.token().value}'`)
             }
         }
 
@@ -161,12 +159,12 @@ export default class Parser {
     }
 
     private multiplicative(): Expression {
-        let left = this.primary();
+        let left = this.callMember();
 
         const checks = ["*", "*", "/", "%"]
         while (checks.includes(this.token().value)) {
             const operator = this.next().value
-            const right = this.primary();
+            const right = this.callMember();
             left = {
                 kind: "BinaryExpression",
                 left: left,
@@ -176,6 +174,79 @@ export default class Parser {
         }
 
        return left;
+    }
+
+    private callMember(): Expression {
+        const m = this.member();
+
+        if (this.token().type == TokenType.OpenParen) {
+            return this.call(m) as Call;
+        }
+
+        return m as Member;
+    }
+
+    private call(caller: Expression): Expression {
+        let callExpr: Expression = {
+            kind: "Call",
+            caller: caller,
+            args: this.args(),
+        } as Call;
+
+        if (this.token().type == TokenType.OpenParen) {
+            callExpr = this.call(callExpr);
+        }
+
+        return callExpr;
+    }
+
+    private member(): Expression {
+        let object = this.primary();
+
+        while (this.token().type == TokenType.Dot || this.token().type == TokenType.OpenBracket){
+            const operator = this.next();
+            let property: Expression;
+            let computed: boolean;
+
+            if (operator.type == TokenType.Dot) {
+                computed = false;
+                property = this.primary();
+                if (property.kind != "Identifier") {
+                    throw new Error(`Expected TokenType.Identifier after dot in member expression but found '${property.kind}'`);
+                }
+            } else {
+                computed = true;
+                property = this.expression();
+                this.nextExpect(TokenType.CloseBracket, `Expected TokenType.CloseBracket after member expression but found '${this.token().value}'`);
+            }
+            
+            object = {
+                kind: "Member",
+                object: object,
+                property: property,
+                computed: computed,
+            } as Member;
+        }
+
+        return object;
+    }
+
+    private args(): Expression[] {
+        this.nextExpect(TokenType.OpenParen, `Expected TokenType.OpenParen at the start of args but found '${this.token().value}'`);
+        const args = (this.token().type == TokenType.CloseParen) ? [] : this.argsList();
+        this.nextExpect(TokenType.CloseParen, `Expected TokenType.CloseParen at the end of args but found '${this.token().value}'`);
+        return args;
+    }
+
+    private argsList(): Expression[] {
+        const args: Expression[] = [];
+        while (this.token().type !== TokenType.CloseParen && this.token().type !== TokenType.EOF) {
+            args.push(this.assignment());
+            if (this.token().type == TokenType.Comma) {
+                this.next();
+            }
+        }
+        return args;
     }
 
     private primary(): Expression {

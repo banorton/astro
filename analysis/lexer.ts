@@ -14,11 +14,13 @@ export enum TokenType {
     CloseParen,
     OpenBrace,
     CloseBrace,
+    OpenBracket,
+    CloseBracket,
     BinaryOperator,
     Semicolon,
     Colon,
-    // NewLine,
     Comma,
+    Dot,
 
     // End of file
     EOF,
@@ -59,6 +61,10 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.OpenBrace));
         } else if (src[0] == '}') {
             tokens.push(mktoken(src.shift(), TokenType.CloseBrace));
+        } else if (src[0] == '[') {
+            tokens.push(mktoken(src.shift(), TokenType.OpenBracket));
+        } else if (src[0] == ']') {
+            tokens.push(mktoken(src.shift(), TokenType.CloseBracket));
         } else if (src[0] == '+' || src[0] == '-' || src[0] == '/' || src[0] == '*' || src[0] == '%') {
             tokens.push(mktoken(src.shift(), TokenType.BinaryOperator));
         } else if (src[0] == '=') {
@@ -67,15 +73,15 @@ export function tokenize(srcCode: string): Token[] {
             tokens.push(mktoken(src.shift(), TokenType.Semicolon));
         } else if (src[0] == ':') {
             tokens.push(mktoken(src.shift(), TokenType.Colon));
-        // } else if (src[0] == '\n') {
-        //     tokens.push(mktoken(src.shift(), TokenType.NewLine));
         } else if (src[0] == ',') {
             tokens.push(mktoken(src.shift(), TokenType.Comma));
+        } else if (src[0] == '.') {
+            tokens.push(mktoken(src.shift(), TokenType.Dot));
         } else {
             // Handle multicharacter tokens
             if (isalpha(src[0])) {
                 let ident = "";
-                while (src.length > 0 && isalpha(src[0])) {
+                while (src.length > 0 && (isalpha(src[0]) || isnumeric(src[0]))) {
                     ident += src.shift();
                 }
 

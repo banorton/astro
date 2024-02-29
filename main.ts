@@ -4,18 +4,26 @@ import { evaluate } from './synthesis/interpreter'
 import Environment from './synthesis/environment';
 import { MKBOOL, MKNUMBER, MKNULL, NumberVal } from './synthesis/values';
 import * as fs from 'fs';
+import { Call, Declaration, Member } from './analysis/ast';
 
 readFromFile();
 
 function readFromFile() {
-    const filename = './examples/example.astro';
+    const filename = './examples/example2.astro';
     let content = fs.readFileSync(filename, 'utf8');
 
     const parser = new Parser();
     const env = new Environment();
     const ast = parser.createAST(content);
-    const result = evaluate(ast, env);
-    console.log(result);
+    console.log(content);
+    console.log(ast);
+    console.log((ast.body[0] as Declaration).value);
+    // console.log((ast.body[0] as Call).caller);
+    // console.log((ast.body[0] as Member).object);
+    // console.log((ast.body[0] as Member).property);
+    // console.log((ast.body[0] as Call).args);
+    // const result = evaluate(ast, env);
+    // console.log(result);
 }
 
 function repl() {

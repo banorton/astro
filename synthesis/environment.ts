@@ -2,7 +2,7 @@ import { RuntimeVal } from "./values";
 
 export default class Environment {
     private parent?: Environment;
-    public variables: Map<string, RuntimeVal>;
+    private variables: Map<string, RuntimeVal>;
     private constants: Set<string>;
 
     constructor(parent?: Environment) {

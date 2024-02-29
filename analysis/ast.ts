@@ -9,6 +9,8 @@ export type NodeType =
 | "Assignment"
 | "ObjectLiteral"
 | "Property"
+| "Member"
+| "Call"
 | "BinaryExpression";
 
 // Statement
@@ -35,6 +37,19 @@ export interface Assignment extends Expression {
     kind: "Assignment";
     left: Expression;
     right: Expression;
+}
+
+export interface Call extends Expression {
+    kind: "Call";
+    caller: Expression;
+    args: Expression[];
+}
+
+export interface Member extends Expression {
+    kind: "Member";
+    object: Expression;
+    property: Expression;
+    computed: boolean;
 }
 
 export interface BinaryExpression extends Expression {
