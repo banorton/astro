@@ -1,2 +1,2 @@
 # Overview
-A basic compiler. Currently works with binary expressions, variable declaration and assignment, and objects.
+A basic interpreter written in TypeScript. Currently works with binary expressions, variable declaration and assignment, and objects.
